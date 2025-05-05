@@ -263,13 +263,11 @@ function main() {
   // Set up actions for HTML UI
   addActionsForHtmlUI();
 
+  // Register the keyboard event handler
+  document.onkeydown = keydown; 
+
   // Initialize textures
   initTextures();
-
-  // Register function (event handler) to be called on a mouse press
-  //canvas.onmousedown = click;
-  // canvas.onmousemove = click;
-  //canvas.onmousemove = function(ev) { if (ev.buttons == 1) click(ev); };
 
   /// ChatGPT helped me with this camera rotation code
   canvas.addEventListener('mousedown', function(ev) {
@@ -377,7 +375,30 @@ function updateAnimationAngles() {
   }
 }
 
-var g_eye = [0,0,2.5];
+function keydown(ev) {
+  // Move camera right
+  if (ev.keyCode == 68) { // D key
+    g_eye[0] += 0.1;
+  }
+  // Move camera left
+  else if (ev.keyCode == 65) { // A key
+    g_eye[0] -= 0.1;
+  }
+
+  // Move camera forward
+  if (ev.keyCode == 87) { // W key
+    g_eye[2] -= 0.1;
+  }
+  // Move camera backward
+  else if (ev.keyCode == 83) { // S key
+    g_eye[2] += 0.1;
+  }
+
+  renderAllShapes();
+  console.log(ev.keycode);
+}
+
+var g_eye = [0,0,3];
 var g_at = [0,0,-100];
 var g_up = [0,1,0];
 
