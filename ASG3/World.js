@@ -394,6 +394,15 @@ function keydown(ev) {
     g_eye[2] += 0.1;
   }
 
+  // Rotate Camera right with E key
+  if (ev.keyCode == 69) { // E key
+    g_at[0] += 3;
+  }
+  // Rotate Camera left with Q key
+  else if (ev.keyCode == 81) { // Q key
+    g_at[0] -= 3;
+  }
+
   renderAllShapes();
   console.log(ev.keycode);
 }
@@ -407,11 +416,11 @@ function renderAllShapes() {
   
   // Initialize the projection and view matrix
   var projectionMatrix = new Matrix4();
-  projectionMatrix.setPerspective(60, canvas.width/canvas.height, 1, 100); // Set perspective projection
+  projectionMatrix.setPerspective(60, canvas.width/canvas.height, 1, 100);
   gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
 
   var viewMatrix = new Matrix4();
-  viewMatrix.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]); // Set view matrix
+  viewMatrix.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
   gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
 
   /// ChatGPT helped me with the global rotation matrix
