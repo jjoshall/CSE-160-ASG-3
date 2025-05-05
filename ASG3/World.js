@@ -19,9 +19,11 @@ var FSHADER_SOURCE =`
   precision mediump float;
   varying vec2 v_UV;
   uniform vec4 u_FragColor;
+  uniform sampler2D u_Sampler0;
   void main() {
     gl_FragColor = u_FragColor;
-    gl_FragColor = vec4(v_UV, 1.0, 1.0); // Uncomment this line to see the UV coordinates
+    gl_FragColor = vec4(v_UV, 1.0, 1.0);
+    gl_FragColor = texture2D(u_Sampler0, v_UV);
   }`
 
 // Global Variables
@@ -30,11 +32,12 @@ let gl;
 let a_Position;
 let a_UV;
 let u_FragColor;
-//let u_Size;
+let u_Size;
 let u_ModelMatrix;
 let u_ViewMatrix;
 let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
+let u_Sampler0;
 
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -107,6 +110,13 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of u_Sampler0
+  var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0'); // Get the storage location of u_Sampler0
+  if (!u_Sampler0) {
+    console.log('Failed to get the storage location of u_Sampler0');
+    return false;
+  }
+
   // Get the storage location of u_Size
   // u_Size = gl.getUniformLocation(gl.program, 'u_Size');
   // if (!u_Size) {
@@ -177,6 +187,53 @@ function addActionsForHtmlUI() {
   document.getElementById('rightCalfSlide').addEventListener('mousemove', function() { g_rightCalfAngle = this.value; renderAllShapes(); });
 }
 
+function initTextures() {
+  // Create the image object
+  var image = new Image(); 
+  if (!image) {
+    console.log('Failed to create the image object');
+    return false;
+  }
+
+  // Register the event handler to be called on loading an image
+  image.onload = function() { sendImageToTEXTURE0(image); };
+  // Specify the image to be loaded
+  image.src = 'ASG3/sky.jpg';
+
+  // Success and image loading
+  return true;
+}
+
+function sendImageToTEXTURE0(image) {
+  // Create a texture object
+  var texture = gl.createTexture(); 
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
+  // Flip the image's y axis
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); 
+
+  // Activate texture unit 0
+  gl.activeTexture(gl.TEXTURE0); 
+
+  // Bind the texture object to the target
+  gl.bindTexture(gl.TEXTURE_2D, texture); 
+
+  // Set texture parameters
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+  // Assign the image object to the texture object
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+  // Pass the texture
+  gl.uniform1i(u_Sampler0, 0);
+
+  //gl.clear(gl.COLOR_BUFFER_BIT); // Clear <canvas>
+  // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n); // Draw the rectangle
+  console.log('Texture loaded and applied');
+}
+
 function main() {
   // Set up canvas and gl variables
   setupWebGL();
@@ -195,10 +252,13 @@ function main() {
   // Set up actions for HTML UI
   addActionsForHtmlUI();
 
+  // Initialize textures
+  initTextures();
+
   // Register function (event handler) to be called on a mouse press
-  canvas.onmousedown = click;
+  //canvas.onmousedown = click;
   // canvas.onmousemove = click;
-  canvas.onmousemove = function(ev) { if (ev.buttons == 1) click(ev); };
+  //canvas.onmousemove = function(ev) { if (ev.buttons == 1) click(ev); };
 
   /// ChatGPT helped me with this camera rotation code
   canvas.addEventListener('mousedown', function(ev) {
@@ -334,14 +394,6 @@ function renderAllShapes() {
   var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
   globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
-
-  // draw a big cube
-  var bigCube = new Cube();
-  bigCube.color = [0.5, 0.5, 0.5, 1];
-  bigCube.matrix.translate(-0.5, -0.5, 0.5);
-  bigCube.matrix.rotate(90, 0, 1, 0);
-  bigCube.matrix.scale(1.0, 1.0, 1.0);
-  bigCube.render();
 
   // Left thigh
   var leftThigh = new Cube();
