@@ -441,9 +441,9 @@ function renderAllShapes() {
   var ground = new Cube();
   ground.color = [0.0, 0.4, 0.0, 1];
   ground.textureNum = -2; // No texture
-  ground.matrix.translate(-2.0, -2.67, .5);
+  ground.matrix.translate(-5.0, -1, -5);
   ground.matrix.rotate(0, 1, 0, 0);
-  ground.matrix.scale(100.0, 2, 0.0);
+  ground.matrix.scale(10.0, 0, 10.0);
   ground.render();
 
   var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
