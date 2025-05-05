@@ -446,6 +446,14 @@ function renderAllShapes() {
   ground.matrix.scale(10.0, 0, 10.0);
   ground.render();
 
+  // Sky
+  var sky = new Cube();
+  sky.color = [0, 0, 0, 1];
+  sky.textureNum = 0; // Sky texture
+  sky.matrix.scale(50, 50, 50);
+  sky.matrix.translate(-.5, -0.5, -0.5);
+  sky.render();
+
   var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
   globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
