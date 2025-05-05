@@ -411,6 +411,30 @@ var g_eye = [0,0,3];
 var g_at = [0,0,-100];
 var g_up = [0,1,0];
 
+var g_map = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 1, 1, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 1, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+];
+
+function drawMap() {
+  for (var x = 0; x < 8; x++) {
+    for (var y = 0; y < 8; y++) {
+      if (g_map[x][y] == 1) {
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.matrix.translate(x - 4, -.75, y - 4);
+        cube.render();
+      }
+    }
+  }
+}
+
 function renderAllShapes() {
   var startTime = performance.now();
   
@@ -436,6 +460,8 @@ function renderAllShapes() {
   /// ChatGPT helped me make sure the ground wouldn't rotate
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, identityM.elements);
+
+  drawMap(); // Draw the map
 
   // Ground
   var ground = new Cube();
