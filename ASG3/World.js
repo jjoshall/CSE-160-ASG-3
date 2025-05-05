@@ -20,10 +20,20 @@ var FSHADER_SOURCE =`
   varying vec2 v_UV;
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
+  uniform int u_whichTexture;
   void main() {
-    gl_FragColor = u_FragColor;
-    gl_FragColor = vec4(v_UV, 1.0, 1.0);
-    gl_FragColor = texture2D(u_Sampler0, v_UV);
+    if (u_whichTexture == -2) {
+      gl_FragColor = u_FragColor; // Use color
+    }
+    else if (u_whichTexture == -1) {
+      gl_FragColor = vec4(v_UV, 1.0, 1.0); // Use UV debug color
+    }
+    else if (u_whichTexture == 0) {
+      gl_FragColor = texture2D(u_Sampler0, v_UV); // Use texture
+    }
+    else {
+      gl_FragColor = vec4(1, .2, .2, 1); // Error, put redish
+    }
   }`
 
 // Global Variables
@@ -38,6 +48,7 @@ let u_ViewMatrix;
 let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
 let u_Sampler0;
+let u_whichTexture;
 
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -114,6 +125,13 @@ function connectVariablesToGLSL() {
   var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0'); // Get the storage location of u_Sampler0
   if (!u_Sampler0) {
     console.log('Failed to get the storage location of u_Sampler0');
+    return false;
+  }
+
+  // Get the storage location of u_whichTexture
+  u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture'); // Get the storage location of u_whichTexture
+  if (!u_whichTexture) {
+    console.log('Failed to get the storage location of u_whichTexture');
     return false;
   }
 
@@ -242,13 +260,6 @@ function main() {
 
   initTriangle3DBuffer(); // Initialize the buffer for 3D triangles
 
-  // Initialize the projection and view matrix
-  var viewMatrix = new Matrix4().setLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
-  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
-
-  var projectionMatrix = new Matrix4().setPerspective(30, canvas.width/canvas.height, 0.1, 100);
-  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
-
   // Set up actions for HTML UI
   addActionsForHtmlUI();
 
@@ -280,7 +291,7 @@ function main() {
     if (g_isDragging) {
       let dx = ev.clientX - g_lastMouseX;
       let dy = ev.clientY - g_lastMouseY;
-      g_globalAngleX -= (dx * 0.5);
+      g_globalAngleX += (dx * 0.5);
       g_globalAngleY -= (dy * 0.5);
 
       g_globalAngleY = Math.max(-90, Math.min(90, g_globalAngleY));
@@ -369,6 +380,13 @@ function updateAnimationAngles() {
 function renderAllShapes() {
   var startTime = performance.now();
   
+  // Initialize the projection and view matrix
+  var viewMatrix = new Matrix4();
+  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+
+  var projectionMatrix = new Matrix4();
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
+
   /// ChatGPT helped me with the global rotation matrix
   // Pass the matrix to u_ModelMatrix variable
   var globalRotMat = new Matrix4().rotate(g_globalAngleX, 0, 1, 0);
@@ -386,6 +404,7 @@ function renderAllShapes() {
   // Ground
   var ground = new Cube();
   ground.color = [0.0, 0.4, 0.0, 1];
+  ground.textureNum = -2; // No texture
   ground.matrix.translate(-2.0, -2.67, .5);
   ground.matrix.rotate(0, 1, 0, 0);
   ground.matrix.scale(100.0, 2, 0.0);
@@ -458,6 +477,7 @@ function renderAllShapes() {
   // Gray body
   var body = new Cube();
   body.color = [0.8, 0.8, 0.8, 1.0];
+  body.textureNum = -2; // No texture
   body.matrix.translate(-.25, -.4, -0.4);
   body.matrix.rotate(0, 1, 0, 0);
   body.matrix.scale(0.5, 0.5, 0.7);
