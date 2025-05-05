@@ -21,7 +21,7 @@ var FSHADER_SOURCE =`
   uniform vec4 u_FragColor;
   void main() {
     gl_FragColor = u_FragColor;
-    //gl_FragColor = vec4(v_UV, 1.0, 1.0);
+    gl_FragColor = vec4(v_UV, 1.0, 1.0); // Uncomment this line to see the UV coordinates
   }`
 
 // Global Variables
@@ -30,10 +30,10 @@ let gl;
 let a_Position;
 let a_UV;
 let u_FragColor;
-let u_Size;
+//let u_Size;
 let u_ModelMatrix;
-let u_ProjectionMatrix;
 let u_ViewMatrix;
+let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
 
 function setupWebGL() {
@@ -41,6 +41,7 @@ function setupWebGL() {
   canvas = document.getElementById('webgl');
 
   // Get the rendering context for WebGL
+  // gl = getWebGLContext(canvas);
   gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
   if (!gl) {
     console.log('Failed to get the rendering context for WebGL');
@@ -92,6 +93,13 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of u_ViewMatrix
+  u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+  if (!u_ViewMatrix) {
+    console.log('Failed to get the storage location of u_ViewMatrix');
+    return;
+  }
+
   // Get the storage location of u_ProjectionMatrix
   u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
   if (!u_ProjectionMatrix) {
@@ -99,12 +107,12 @@ function connectVariablesToGLSL() {
     return;
   }
 
-  // Get the storage location of u_ViewMatrix
-  u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-  if (!u_ViewMatrix) {
-    console.log('Failed to get the storage location of u_ViewMatrix');
-    return;
-  }
+  // Get the storage location of u_Size
+  // u_Size = gl.getUniformLocation(gl.program, 'u_Size');
+  // if (!u_Size) {
+  //   console.log('Failed to get the storage location of u_Size');
+  //   return;
+  // }
 
   // Set initial value for this matrix to identify
   var identityM = new Matrix4();
@@ -144,7 +152,29 @@ let g_shiverAnimation = false;
 let g_shiverStartTime = 0;
 
 function addActionsForHtmlUI() {
-  console.log("addActionsForHtmlUI() called");
+  // Button events
+  document.getElementById('animationLowerBeakOffButton').onclick = function() { g_lowerBeakAnimation = false; };
+  document.getElementById('animationLowerBeakOnButton').onclick = function() { g_lowerBeakAnimation = true; };
+  document.getElementById('animationWingsOffButton').onclick = function() { g_wingsAnimation = false; };
+  document.getElementById('animationWingsOnButton').onclick = function() { g_wingsAnimation = true; };
+  document.getElementById('animationLeftLegOffButton').onclick = function() { g_leftLegAnimation = false; };
+  document.getElementById('animationLeftLegOnButton').onclick = function() { g_leftLegAnimation = true; };
+  document.getElementById('animationRightLegOffButton').onclick = function() { g_rightLegAnimation = false; };
+  document.getElementById('animationRightLegOnButton').onclick = function() { g_rightLegAnimation = true; };
+  document.getElementById('animationLeftFootOffButton').onclick = function() { g_leftFootAnimation = false; };
+  document.getElementById('animationLeftFootOnButton').onclick = function() { g_leftFootAnimation = true; };
+  document.getElementById('animationRightFootOffButton').onclick = function() { g_rightFootAnimation = false; };
+  document.getElementById('animationRightFootOnButton').onclick = function() { g_rightFootAnimation = true; };
+
+  // Slider events
+  document.getElementById('lowerBeakSlide').addEventListener('mousemove', function() { g_lowerBeakAngle = this.value; renderAllShapes(); });
+  document.getElementById('wingsSlide').addEventListener('mousemove', function() { g_wingsAngle = this.value; renderAllShapes(); });
+  document.getElementById('leftThighSlide').addEventListener('mousemove', function() { g_leftThighAngle = this.value; renderAllShapes(); });
+  document.getElementById('rightThighSlide').addEventListener('mousemove', function() { g_rightThighAngle = this.value; renderAllShapes(); });
+  document.getElementById('leftFootSlide').addEventListener('mousemove', function() { g_leftFootAngle = this.value; renderAllShapes(); });
+  document.getElementById('rightFootSlide').addEventListener('mousemove', function() { g_rightFootAngle = this.value; renderAllShapes(); });
+  document.getElementById('leftCalfSlide').addEventListener('mousemove', function() { g_leftCalfAngle = this.value; renderAllShapes(); });
+  document.getElementById('rightCalfSlide').addEventListener('mousemove', function() { g_rightCalfAngle = this.value; renderAllShapes(); });
 }
 
 function main() {
@@ -154,7 +184,13 @@ function main() {
   connectVariablesToGLSL();
 
   initTriangle3DBuffer(); // Initialize the buffer for 3D triangles
-  initTriangle3DUVBuffer(); // Initialize the buffer for 3D triangles with UV coordinates
+
+  // Initialize the projection and view matrix
+  var viewMatrix = new Matrix4().setLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+
+  var projectionMatrix = new Matrix4().setPerspective(30, canvas.width/canvas.height, 0.1, 100);
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
 
   // Set up actions for HTML UI
   addActionsForHtmlUI();
@@ -196,7 +232,7 @@ function main() {
   });
 
   // Specify the color for clearing <canvas>
-  gl.clearColor(0, 0, 0, 1);
+  gl.clearColor(0, 0, 0.9, .5);
 
   requestAnimationFrame(tick); // Start the tick function
 }
@@ -290,21 +326,22 @@ function renderAllShapes() {
   // Ground
   var ground = new Cube();
   ground.color = [0.0, 0.4, 0.0, 1];
-  ground.matrix.translate(-2.0, -2.71, .5);
+  ground.matrix.translate(-2.0, -2.67, .5);
   ground.matrix.rotate(0, 1, 0, 0);
   ground.matrix.scale(100.0, 2, 0.0);
   ground.render();
 
-  var globalRotMat = new Matrix4().rotate(g_globalAngleX, 0, 1, 0);
+  var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
   globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
-  var myCone = new Cone();
-  myCone.color = [1, 0, 0, 1.0];
-  myCone.matrix.translate(0, .3, -.5);
-  myCone.matrix.rotate(70, 1, 0, 0);
-  myCone.matrix.scale(0.1, 0.3, 0.3);
-  myCone.render();
+  // draw a big cube
+  var bigCube = new Cube();
+  bigCube.color = [0.5, 0.5, 0.5, 1];
+  bigCube.matrix.translate(-0.5, -0.5, 0.5);
+  bigCube.matrix.rotate(90, 0, 1, 0);
+  bigCube.matrix.scale(1.0, 1.0, 1.0);
+  bigCube.render();
 
   // Left thigh
   var leftThigh = new Cube();
@@ -459,37 +496,6 @@ var g_shapesList = []; // The array for the position of a mouse press
 function click(ev) {
   // Extract the event click and return it in WebGL coordinates
   let [x, y] = convertCoordinatesEventToGL(ev);
-
-  // /// ChatGPT helped me with this math
-  // let currentTime = performance.now();
-  // let velocity = 0;
-
-  // if (g_lastMousePos && g_lastMouseTime) {
-  //   let dx = x - g_lastMousePos[0];
-  //   let dy = y - g_lastMousePos[1];
-  //   let dt = currentTime - g_lastMouseTime;
-  //   let dist = Math.sqrt(dx * dx + dy * dy);
-  //   velocity = dist / dt; // pixels/ms
-  // }
-
-  // g_lastMousePos = [x, y];
-  // g_lastMouseTime = currentTime;
-
-  // // Create and store a new point object
-  // let point;
-  // if (g_seletcedType == POINT) {
-  //   point = new Point();
-  // }
-  // else if (g_seletcedType == TRIANGLE) {
-  //   point = new Triangle();
-  // }
-  // else if (g_seletcedType == CIRCLE) {
-  //   point = new Circle();
-  //   point.segments = g_seletcedSegment;
-  // }
-
-  // point.position = [x, y];
-  // point.timestamp = performance.now();
 
   // Draw every shape that is supposed to be drawn
   renderAllShapes();
