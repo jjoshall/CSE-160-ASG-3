@@ -291,7 +291,7 @@ function main() {
     if (g_isDragging) {
       let dx = ev.clientX - g_lastMouseX;
       let dy = ev.clientY - g_lastMouseY;
-      g_globalAngleX += (dx * 0.5);
+      g_globalAngleX -= (dx * 0.5);
       g_globalAngleY -= (dy * 0.5);
 
       g_globalAngleY = Math.max(-90, Math.min(90, g_globalAngleY));
@@ -377,15 +377,21 @@ function updateAnimationAngles() {
   }
 }
 
+var g_eye = [0,0,2.5];
+var g_at = [0,0,-100];
+var g_up = [0,1,0];
+
 function renderAllShapes() {
   var startTime = performance.now();
   
   // Initialize the projection and view matrix
-  var viewMatrix = new Matrix4();
-  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
-
   var projectionMatrix = new Matrix4();
+  projectionMatrix.setPerspective(60, canvas.width/canvas.height, 1, 100); // Set perspective projection
   gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
+
+  var viewMatrix = new Matrix4();
+  viewMatrix.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]); // Set view matrix
+  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
 
   /// ChatGPT helped me with the global rotation matrix
   // Pass the matrix to u_ModelMatrix variable
