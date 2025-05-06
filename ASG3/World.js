@@ -156,8 +156,6 @@ const CIRCLE = 2;
 let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
 let g_selectedSize = 5.0;
 let g_seletcedType = POINT;
-let g_globalAngleX = 0;
-let g_globalAngleY = 0;
 let g_isDragging = false;
 let g_lastMouseX = null;
 let g_lastMouseY = null;
@@ -293,13 +291,16 @@ function main() {
     if (g_isDragging) {
       let dx = ev.clientX - g_lastMouseX;
       let dy = ev.clientY - g_lastMouseY;
-      g_globalAngleX -= (dx * 0.5);
-      g_globalAngleY -= (dy * 0.5);
+      
+      // mouse sensitivity
+      const panSpeed = 0.2;
 
-      g_globalAngleY = Math.max(-90, Math.min(90, g_globalAngleY));
+      g_camera.panLeft(-dx * panSpeed);
+      g_camera.panUp(-dy * panSpeed);
 
       g_lastMouseX = ev.clientX;
       g_lastMouseY = ev.clientY;
+
       renderAllShapes(); // Draw the shapes
     }
   });
@@ -330,12 +331,10 @@ function updateAnimationAngles() {
   if (g_shiverAnimation) {
     let elapsed = g_seconds - g_shiverStartTime;
     
-    /// Asked ChatGPT for help on just the shiver part (changing g_globalAngleX) of the animation
     if (elapsed > 2) {
       g_shiverAnimation = false; // Stop the animation after 1 second
     }
     else {
-      g_globalAngleX += Math.sin(g_seconds * 5) * 5; // Shiver effect
       // shake legs
       g_leftThighAngle += Math.sin(g_seconds * 20) * 5;
       g_rightThighAngle += -Math.sin(g_seconds * 20) * 5;
@@ -395,7 +394,6 @@ function keydown(ev) {
   }
 
   renderAllShapes();
-  console.log(ev.keycode);
 }
 
 var g_eye = [0,0,3];
@@ -440,12 +438,6 @@ function renderAllShapes() {
   viewMatrix.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
   gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMatrix.elements);
 
-  /// ChatGPT helped me with the global rotation matrix
-  // Pass the matrix to u_ModelMatrix variable
-  var globalRotMat = new Matrix4().rotate(g_globalAngleX, 0, 1, 0);
-  globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
-  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
-
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -453,10 +445,6 @@ function renderAllShapes() {
   /// ChatGPT helped me make sure the ground wouldn't rotate
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, identityM.elements);
-
-  var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
-  globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
-  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
   drawMap(); // Draw the map
 
