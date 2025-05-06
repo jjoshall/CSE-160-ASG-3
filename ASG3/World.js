@@ -177,6 +177,7 @@ let g_rightFootAnimation = false;
 let g_shiverAnimation = false;
 let g_shiverStartTime = 0;
 let g_camera;
+let g_activeKeys = new Set(); // Set to keep track of active keys
 
 function addActionsForHtmlUI() {
   // Button events
@@ -263,7 +264,14 @@ function main() {
   addActionsForHtmlUI();
 
   // Register the keyboard event handler
-  document.onkeydown = keydown; 
+  // document.onkeydown = keydown; 
+
+  document.addEventListener('keydown', (ev) => {
+    g_activeKeys.add(ev.key.toLowerCase());
+  });
+  document.addEventListener('keyup', (ev) => {
+    g_activeKeys.delete(ev.key.toLowerCase());
+  });
 
   // Initialize textures
   initTextures();
@@ -317,6 +325,19 @@ var g_seconds = performance.now() / 1000.0 - g_startTime; // Time in seconds
 // Called by browser repeatedly to update the display
 function tick() {
   g_seconds = performance.now() / 1000.0 - g_startTime; // Update time in seconds
+
+  const speed = 0.2;
+  const turn = 2;
+
+  // Handle camera movement based on key presses
+  if (g_activeKeys.has('w')) g_camera.moveForward(speed);
+  if (g_activeKeys.has('s')) g_camera.moveBackwards(speed);
+  if (g_activeKeys.has('a')) g_camera.moveLeft(speed);
+  if (g_activeKeys.has('d')) g_camera.moveRight(speed);
+  if (g_activeKeys.has('q')) g_camera.panLeft(turn);
+  if (g_activeKeys.has('e')) g_camera.panRight(turn);
+  if (g_activeKeys.has('o')) g_camera.panUp(turn);
+  if (g_activeKeys.has('p')) g_camera.panUp(-turn);
   
   // Update the angles of everything if currently animating
   updateAnimationAngles();
@@ -401,24 +422,43 @@ var g_at = [0,0,-100];
 var g_up = [0,1,0];
 
 var g_map = [
-  [1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 1, 1, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 1, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 1, 0],
+  [0, 0, 1, 0, 0, 0, 0, 0],
 ];
 
 function drawMap() {
-  for (var x = 0; x < 32; x++) {
-    for (var y = 0; y < 32; y++) {
-      if (x == 0 || x == 31 || y == 0 || y == 31) {
+  // Draws the map outline
+  var mapOutline = [];
+  
+  for (let x = 0; x < 32; x++) {
+    mapOutline[x] = [];
+    for (let y = 0; y < 32; y++) {
+      if (x === 0 || x === 31 || y === 0 || y === 31) {
+        var outlineCube = new Cube();
+        outlineCube.color = [0.5, 0.5, 0.5, 1];
+        outlineCube.textureNum = -2; // No texture
+        outlineCube.matrix.translate(x - 7, -.99, y - 8);
+        outlineCube.renderFast();
+      }
+    }
+  }
+
+  for (var x = 0; x < g_map.length; x++) {
+    for (var y = 0; y < g_map[x].length; y++) {
+      if (g_map[x][y] == 1) {
         var cube = new Cube();
         cube.color = [0.5, 0.5, 0.5, 1];
         cube.textureNum = -2; // No texture
-        cube.matrix.translate(x - 4, -.75, y - 4);
+        cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
       }
     }
@@ -452,9 +492,9 @@ function renderAllShapes() {
   var ground = new Cube();
   ground.color = [0.0, 0.4, 0.0, 1];
   ground.textureNum = -2; // No texture
-  ground.matrix.translate(-5.0, -1, -5);
+  ground.matrix.translate(-7.0, -1, -8);
   ground.matrix.rotate(0, 1, 0, 0);
-  ground.matrix.scale(40.0, 0, 40.0);
+  ground.matrix.scale(32.0, 0, 32.0);
   ground.render();
 
   // Sky
@@ -462,7 +502,7 @@ function renderAllShapes() {
   sky.color = [0, 0, 0, 1];
   sky.textureNum = 0; // Sky texture
   sky.matrix.scale(100, 100, 100);
-  sky.matrix.translate(-.5, -0.5, -0.5);
+  sky.matrix.translate(-.4, -0.5, -0.5);
   sky.render();
 
   // Left thigh
