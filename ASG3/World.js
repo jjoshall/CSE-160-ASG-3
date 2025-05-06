@@ -20,6 +20,7 @@ var FSHADER_SOURCE =`
   varying vec2 v_UV;
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
+  uniform sampler2D u_Sampler1;
   uniform int u_whichTexture;
   void main() {
     if (u_whichTexture == -2) {
@@ -29,7 +30,10 @@ var FSHADER_SOURCE =`
       gl_FragColor = vec4(v_UV, 1.0, 1.0); // Use UV debug color
     }
     else if (u_whichTexture == 0) {
-      gl_FragColor = texture2D(u_Sampler0, v_UV); // Use texture
+      gl_FragColor = texture2D(u_Sampler0, v_UV); // Use space texture
+    }
+    else if (u_whichTexture == 1) {
+      gl_FragColor = texture2D(u_Sampler1, v_UV); // Use lava texture
     }
     else {
       gl_FragColor = vec4(1, .2, .2, 1); // Error, put redish
@@ -48,6 +52,7 @@ let u_ViewMatrix;
 let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
 let u_Sampler0;
+let u_Sampler1;
 let u_whichTexture;
 
 function setupWebGL() {
@@ -128,6 +133,13 @@ function connectVariablesToGLSL() {
     return false;
   }
 
+  // Get the storage location of u_Sampler1
+  var u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1'); // Get the storage location of u_Sampler1
+  if (!u_Sampler1) {
+    console.log('Failed to get the storage location of u_Sampler1');
+    return false;
+  }
+
   // Get the storage location of u_whichTexture
   u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture'); // Get the storage location of u_whichTexture
   if (!u_whichTexture) {
@@ -205,7 +217,7 @@ function addActionsForHtmlUI() {
   document.getElementById('rightCalfSlide').addEventListener('mousemove', function() { g_rightCalfAngle = this.value; renderAllShapes(); });
 }
 
-function initTextures() {
+function initTexture0() {
   // Create the image object
   var image = new Image(); 
   if (!image) {
@@ -216,7 +228,24 @@ function initTextures() {
   // Register the event handler to be called on loading an image
   image.onload = function() { sendImageToTEXTURE0(image); };
   // Specify the image to be loaded
-  image.src = 'ASG3/sky.jpg';
+  image.src = 'ASG3/space.jpeg';
+
+  // Success and image loading
+  return true;
+}
+
+function initTexture1() {
+  // Create the image object
+  var image = new Image(); 
+  if (!image) {
+    console.log('Failed to create the image object');
+    return false;
+  }
+
+  // Register the event handler to be called on loading an image
+  image.onload = function() { sendImageToTEXTURE1(image); };
+  // Specify the image to be loaded
+  image.src = 'ASG3/lava.jpg';
 
   // Success and image loading
   return true;
@@ -252,6 +281,26 @@ function sendImageToTEXTURE0(image) {
   console.log('Texture loaded and applied');
 }
 
+function sendImageToTEXTURE1(image) {
+  var texture = gl.createTexture();
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
+
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // Flip the image's y axis
+
+  gl.activeTexture(gl.TEXTURE1); // Activate texture unit 1
+
+  gl.bindTexture(gl.TEXTURE_2D, texture); // Bind the texture object to the target
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // Set texture parameters
+
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image); // Assign the image object to the texture object
+
+  gl.uniform1i(u_Sampler1, 1); // Pass the texture
+}
+
 function main() {
   // Set up canvas and gl variables
   setupWebGL();
@@ -274,7 +323,8 @@ function main() {
   });
 
   // Initialize textures
-  initTextures();
+  initTexture0();
+  initTexture1();
 
   // Initialize the camera
   g_camera = new Camera(canvas);
@@ -536,7 +586,7 @@ function renderAllShapes() {
   // Ground
   var ground = new Cube();
   ground.color = [0.0, 0.4, 0.0, 1];
-  ground.textureNum = -2; // No texture
+  ground.textureNum = 1; // No texture
   ground.matrix.translate(-7.0, -1, -8);
   ground.matrix.rotate(0, 1, 0, 0);
   ground.matrix.scale(32.0, 0, 32.0);
@@ -546,7 +596,7 @@ function renderAllShapes() {
   var sky = new Cube();
   sky.color = [0, 0, 0, 1];
   sky.textureNum = 0; // Sky texture
-  sky.matrix.scale(100, 100, 100);
+  sky.matrix.scale(200, 200, 200);
   sky.matrix.translate(-.4, -0.5, -0.5);
   sky.render();
 
