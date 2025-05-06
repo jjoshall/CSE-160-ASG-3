@@ -429,7 +429,7 @@ function drawMap() {
         var cube = new Cube();
         cube.color = [0.5, 0.5, 0.5, 1];
         cube.matrix.translate(x - 4, -.75, y - 4);
-        cube.render();
+        cube.renderFast();
       }
     }
   }
@@ -461,6 +461,10 @@ function renderAllShapes() {
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, identityM.elements);
 
+  var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
+  globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
+  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
+
   drawMap(); // Draw the map
 
   // Ground
@@ -479,10 +483,6 @@ function renderAllShapes() {
   sky.matrix.scale(50, 50, 50);
   sky.matrix.translate(-.5, -0.5, -0.5);
   sky.render();
-
-  var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0);
-  globalRotMat.rotate(g_globalAngleY, 1, 0, 0);
-  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
   // Left thigh
   var leftThigh = new Cube();

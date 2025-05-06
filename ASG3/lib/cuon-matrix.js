@@ -708,6 +708,53 @@ var Vector3 = function(opt_src) {
   this.elements = v;
 }
 
+// Set the vectors
+Vector3.prototype.set = function(v) {
+  var e = this.elements;
+  e[0] = v.elements[0];
+  e[1] = v.elements[1];
+  e[2] = v.elements[2];
+  return this;
+};
+
+// Add the vectors
+Vector3.prototype.add = function(v) {
+  var e = this.elements;
+  e[0] += v.elements[0];
+  e[1] += v.elements[1];
+  e[2] += v.elements[2];
+  return this;
+};
+
+// Subtract the vectors
+Vector3.prototype.sub = function(v) {
+  var e = this.elements;
+  e[0] -= v.elements[0];
+  e[1] -= v.elements[1];
+  e[2] -= v.elements[2];
+  return this;
+};
+
+// Multiply the vector
+Vector3.prototype.mul = function(scalar) {
+  var e = this.elements;
+  e[0] *= scalar;
+  e[1] *= scalar;
+  e[2] *= scalar;
+  return this;
+};
+
+// Cross product
+Vector3.prototype.cross = function(v) {
+  var a = this.elements;
+  var b = v.elements;
+  var x = a[1] * b[2] - a[2] * b[1];
+  var y = a[2] * b[0] - a[0] * b[2];
+  var z = a[0] * b[1] - a[1] * b[0];
+  a[0] = x; a[1] = y; a[2] = z;
+  return this;
+};
+
 /**
   * Normalize.
   * @return this
