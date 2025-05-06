@@ -258,7 +258,7 @@ function main() {
   //Set up GLSL shaders and connect variables to GLSL
   connectVariablesToGLSL();
 
-  initTriangle3DBuffer(); // Initialize the buffer for 3D triangles
+  initBuffers(); // Initialize the buffer for 3D triangles
 
   // Set up actions for HTML UI
   addActionsForHtmlUI();
@@ -463,11 +463,26 @@ function drawMap() {
     mapOutline[x] = [];
     for (let y = 0; y < 32; y++) {
       if (x === 0 || x === 31 || y === 0 || y === 31) {
-        var outlineCube = new Cube();
-        outlineCube.color = [0.5, 0.5, 0.5, 1];
-        outlineCube.textureNum = -2; // No texture
-        outlineCube.matrix.translate(x - 7, -.99, y - 8);
-        outlineCube.renderFast();
+        var outlineBottomCube = new Cube();
+        outlineBottomCube.color = [0.5, 0.5, 0.5, 1];
+        outlineBottomCube.textureNum = -1; // No texture
+        outlineBottomCube.matrix.translate(x - 7, -.99, y - 8);
+        outlineBottomCube.renderFast();
+        var outlineMiddle1 = new Cube();
+        outlineMiddle1.color = [0.5, 0.5, 0.5, 1];
+        outlineMiddle1.textureNum = -1; // No texture
+        outlineMiddle1.matrix.translate(x - 7, .01, y - 8);
+        outlineMiddle1.renderFast();
+        var outlineMiddle2 = new Cube();
+        outlineMiddle2.color = [0.5, 0.5, 0.5, 1];
+        outlineMiddle2.textureNum = -1; // No texture
+        outlineMiddle2.matrix.translate(x - 7, 1.01, y - 8);
+        outlineMiddle2.renderFast();
+        var outlineTopCube = new Cube();
+        outlineTopCube.color = [0.5, 0.5, 0.5, 1];
+        outlineTopCube.textureNum = -1; // No texture
+        outlineTopCube.matrix.translate(x - 7, 2.01, y - 8);
+        outlineTopCube.renderFast();
       }
     }
   }
