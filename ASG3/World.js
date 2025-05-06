@@ -178,6 +178,7 @@ let g_rightLegAnimation = false;
 let g_rightFootAnimation = false;
 let g_shiverAnimation = false;
 let g_shiverStartTime = 0;
+let g_camera;
 
 function addActionsForHtmlUI() {
   // Button events
@@ -268,6 +269,9 @@ function main() {
 
   // Initialize textures
   initTextures();
+
+  // Initialize the camera
+  g_camera = new Camera(canvas);
 
   /// ChatGPT helped me with this camera rotation code
   canvas.addEventListener('mousedown', function(ev) {
@@ -376,31 +380,16 @@ function updateAnimationAngles() {
 }
 
 function keydown(ev) {
-  // Move camera right
-  if (ev.keyCode == 68) { // D key
-    g_eye[0] += 0.1;
-  }
-  // Move camera left
-  else if (ev.keyCode == 65) { // A key
-    g_eye[0] -= 0.1;
-  }
+  const speed = 0.2;
+  const turn = 2;
 
-  // Move camera forward
-  if (ev.keyCode == 87) { // W key
-    g_eye[2] -= 0.1;
-  }
-  // Move camera backward
-  else if (ev.keyCode == 83) { // S key
-    g_eye[2] += 0.1;
-  }
-
-  // Rotate Camera right with E key
-  if (ev.keyCode == 69) { // E key
-    g_at[0] += 3;
-  }
-  // Rotate Camera left with Q key
-  else if (ev.keyCode == 81) { // Q key
-    g_at[0] -= 3;
+  switch(ev.key) {
+    case 'w': g_camera.moveForward(speed); break;
+    case 's': g_camera.moveBackwards(speed); break;
+    case 'a': g_camera.moveLeft(speed); break;
+    case 'd': g_camera.moveRight(speed); break;
+    case 'q': g_camera.panLeft(turn); break;
+    case 'e': g_camera.panRight(turn); break;
   }
 
   renderAllShapes();
@@ -423,11 +412,12 @@ var g_map = [
 ];
 
 function drawMap() {
-  for (var x = 0; x < 8; x++) {
-    for (var y = 0; y < 8; y++) {
-      if (g_map[x][y] == 1) {
+  for (var x = 0; x < 32; x++) {
+    for (var y = 0; y < 32; y++) {
+      if (x == 0 || x == 31 || y == 0 || y == 31) {
         var cube = new Cube();
         cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 4, -.75, y - 4);
         cube.renderFast();
       }
@@ -437,15 +427,16 @@ function drawMap() {
 
 function renderAllShapes() {
   var startTime = performance.now();
-  
+  g_camera.resize();
+
   // Initialize the projection and view matrix
   var projectionMatrix = new Matrix4();
   projectionMatrix.setPerspective(60, canvas.width/canvas.height, 1, 100);
-  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, g_camera.projectionMatrix.elements);
 
   var viewMatrix = new Matrix4();
   viewMatrix.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
-  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMatrix.elements);
 
   /// ChatGPT helped me with the global rotation matrix
   // Pass the matrix to u_ModelMatrix variable
@@ -480,7 +471,7 @@ function renderAllShapes() {
   var sky = new Cube();
   sky.color = [0, 0, 0, 1];
   sky.textureNum = 0; // Sky texture
-  sky.matrix.scale(50, 50, 50);
+  sky.matrix.scale(100, 100, 100);
   sky.matrix.translate(-.5, -0.5, -0.5);
   sky.render();
 
