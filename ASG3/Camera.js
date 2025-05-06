@@ -80,6 +80,24 @@ class Camera {
         this.panLeft(-degrees);
     }
 
+    panUp(degrees) {
+        const f = new Vector3().set(this.at).sub(this.eye);
+        const right = Vector3.cross(f, this.up).normalize();
+
+        const rot = new Matrix4().setRotate(
+            degrees, 
+            right.elements[0], right.elements[1], right.elements[2]
+        );
+        const fprime = rot.multiplyVector3(f);
+
+        this.at.set(new Vector3().set(this.eye).add(fprime));
+        this.updateViewMatrix();
+    }
+
+    panDown(degrees) {
+        this.panUp(-degrees);
+    }
+
     resize() {
         this.updateProjectionMatrix();
     }

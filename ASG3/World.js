@@ -390,6 +390,8 @@ function keydown(ev) {
     case 'd': g_camera.moveRight(speed); break;
     case 'q': g_camera.panLeft(turn); break;
     case 'e': g_camera.panRight(turn); break;
+    case 'o': g_camera.panUp(turn); break;
+    case 'p': g_camera.panUp(-turn); break;
   }
 
   renderAllShapes();
@@ -464,7 +466,7 @@ function renderAllShapes() {
   ground.textureNum = -2; // No texture
   ground.matrix.translate(-5.0, -1, -5);
   ground.matrix.rotate(0, 1, 0, 0);
-  ground.matrix.scale(10.0, 0, 10.0);
+  ground.matrix.scale(40.0, 0, 40.0);
   ground.render();
 
   // Sky
@@ -478,7 +480,7 @@ function renderAllShapes() {
   // Left thigh
   var leftThigh = new Cube();
   leftThigh.color = [0.9, 0.7, 0, 1.0];
-  leftThigh.matrix.translate(-.1, -.35, 0.0);
+  leftThigh.matrix.translate(9.9, -.35, 0.0); // Translated by 10 units to the right
   leftThigh.matrix.rotate(180, 0, 0, 1);
   leftThigh.matrix.rotate(g_leftThighAngle, 1, 0, 0);
   var leftThighCoordinatesMat = new Matrix4(leftThigh.matrix);
@@ -508,7 +510,7 @@ function renderAllShapes() {
   // Right thigh
   var rightThigh = new Cube();
   rightThigh.color = [0.9, 0.7, 0, 1.0];
-  rightThigh.matrix.translate(0.2, -.35, 0.0);
+  rightThigh.matrix.translate(10.2, -.35, 0.0); // Translated by 10 units to the right
   rightThigh.matrix.rotate(180, 0, 0, 1);
   rightThigh.matrix.rotate(g_rightThighAngle, 1, 0, 0);
   var rightThighCoordinatesMat = new Matrix4(rightThigh.matrix);
@@ -539,7 +541,7 @@ function renderAllShapes() {
   var body = new Cube();
   body.color = [0.8, 0.8, 0.8, 1.0];
   body.textureNum = -2; // No texture
-  body.matrix.translate(-.25, -.4, -0.4);
+  body.matrix.translate(9.75, -.4, -0.4); // Translated by 10 units to the right
   body.matrix.rotate(0, 1, 0, 0);
   body.matrix.scale(0.5, 0.5, 0.7);
   body.render();
@@ -547,7 +549,7 @@ function renderAllShapes() {
   // Right wing
   var rightWing = new Cube();
   rightWing.color = [0.6, 0.6, 0.6, 1.0];
-  rightWing.matrix.translate(0.25, 0.1, 0.25);
+  rightWing.matrix.translate(10.25, 0.1, 0.25); // Translated by 10 units to the right
   rightWing.matrix.rotate(180, 1, 0, 0);
   rightWing.matrix.rotate(-g_wingsAngle, 0, 0, 1);
   rightWing.matrix.scale(0.07, 0.33, 0.5);
@@ -556,7 +558,7 @@ function renderAllShapes() {
   // Left wing
   var leftWing = new Cube();
   leftWing.color = [0.6, 0.6, 0.6, 1.0];
-  leftWing.matrix.translate(-0.25, .1, -0.25);
+  leftWing.matrix.translate(9.75, .1, -0.25); // Translated by 10 units to the right
   leftWing.matrix.rotate(180, 0, 0, 1);
   leftWing.matrix.rotate(-g_wingsAngle, 0, 0, 1);
   leftWing.matrix.scale(0.07, 0.33, 0.5);
@@ -565,7 +567,7 @@ function renderAllShapes() {
   // Head
   var head = new Cube();
   head.color = [0.9, 0.9, 0.9, 1.0];
-  head.matrix.translate(-0.15, 0.03, -0.6);
+  head.matrix.translate(9.85, 0.03, -0.6); // Translated by 10 units to the right
   head.matrix.rotate(0, 1, 0, 0);
   head.matrix.scale(0.3001, 0.43, 0.27);
   head.render();
@@ -573,7 +575,7 @@ function renderAllShapes() {
   // Beak upper
   var beakUpper = new Cube();
   beakUpper.color = [1.0, 0.6, 0.0, 1.0];
-  beakUpper.matrix.translate(-.148, 0.23, -0.75);
+  beakUpper.matrix.translate(9.852, 0.23, -0.75); // Translated by 10 units to the right
   beakUpper.matrix.rotate(0, 1, 0, 0);
   beakUpper.matrix.scale(0.295, 0.05, 0.3);
   beakUpper.render();
@@ -581,7 +583,7 @@ function renderAllShapes() {
   // Beak lower
   var beakLower = new Cube();
   beakLower.color = [0.8, 0.5, 0.0, 1.0];
-  beakLower.matrix.translate(-.148, 0.23, -0.45);
+  beakLower.matrix.translate(9.852, 0.23, -0.45); // Translated by 10 units to the right
   beakLower.matrix.rotate(180, 1, 0, 0);
   beakLower.matrix.rotate(g_lowerBeakAngle, 1, 0, 0);
   beakLower.matrix.scale(0.295, 0.05, 0.3);
@@ -590,7 +592,7 @@ function renderAllShapes() {
   // Gizzard
   var gizzard = new Cube();
   gizzard.color = [1.0, 0, 0.0, 1.0];
-  gizzard.matrix.translate(-.07, 0.04, -0.7);
+  gizzard.matrix.translate(9.93, 0.04, -0.7); // Translated by 10 units to the right
   gizzard.matrix.rotate(0, 1, 0, 0);
   gizzard.matrix.scale(0.13, 0.15, 0.1);
   gizzard.render();
@@ -598,7 +600,7 @@ function renderAllShapes() {
   // Left eye
   var leftEye = new Cube();
   leftEye.color = [0.0, 0.0, 0.0, 1.0];
-  leftEye.matrix.translate(-0.15, 0.28, -0.602);
+  leftEye.matrix.translate(9.85, 0.28, -0.602); // Translated by 10 units to the right
   leftEye.matrix.rotate(0, 1, 0, 0);
   leftEye.matrix.scale(0.08, g_eyesScale, 0.01);
   leftEye.render();
@@ -606,7 +608,7 @@ function renderAllShapes() {
   // Right eye
   var rightEye = new Cube();
   rightEye.color = [0.0, 0.0, 0.0, 1.0];
-  rightEye.matrix.translate(.07, 0.28, -0.602);
+  rightEye.matrix.translate(10.07, 0.28, -0.602); // Translated by 10 units to the right
   rightEye.matrix.rotate(0, 1, 0, 0);
   rightEye.matrix.scale(0.08, g_eyesScale, 0.01);
   rightEye.render();
