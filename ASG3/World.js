@@ -673,6 +673,13 @@ function renderAllShapes() {
   sky.matrix.translate(-.4, -0.5, -0.5);
   sky.render();
 
+  drawChicken(); // Draw the chicken
+
+  var duration = performance.now() - startTime;
+  sendTextToHTML("ms: " + Math.floor(duration) + " fps: " + Math.floor(1000/duration), "numdot");
+}
+
+function drawChicken() {
   // Left thigh
   var leftThigh = new Cube();
   leftThigh.color = [0.9, 0.7, 0, 1.0];
@@ -808,9 +815,6 @@ function renderAllShapes() {
   rightEye.matrix.rotate(0, 1, 0, 0);
   rightEye.matrix.scale(0.08, g_eyesScale, 0.01);
   rightEye.render();
-
-  var duration = performance.now() - startTime;
-  sendTextToHTML("ms: " + Math.floor(duration) + " fps: " + Math.floor(1000/duration), "numdot");
 }
 
 function sendTextToHTML(text, htmlID) {
