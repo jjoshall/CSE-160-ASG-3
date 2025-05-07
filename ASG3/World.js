@@ -21,6 +21,7 @@ var FSHADER_SOURCE =`
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
   uniform sampler2D u_Sampler1;
+  uniform sampler2D u_Sampler2;
   uniform int u_whichTexture;
   void main() {
     if (u_whichTexture == -2) {
@@ -34,6 +35,9 @@ var FSHADER_SOURCE =`
     }
     else if (u_whichTexture == 1) {
       gl_FragColor = texture2D(u_Sampler1, v_UV); // Use lava texture
+    }
+    else if (u_whichTexture == 2) {
+      gl_FragColor = texture2D(u_Sampler2, v_UV); // Use UV debug color
     }
     else {
       gl_FragColor = vec4(1, .2, .2, 1); // Error, put redish
@@ -53,6 +57,7 @@ let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
 let u_Sampler0;
 let u_Sampler1;
+let u_Sampler2;
 let u_whichTexture;
 
 function setupWebGL() {
@@ -127,16 +132,23 @@ function connectVariablesToGLSL() {
   }
 
   // Get the storage location of u_Sampler0
-  var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0'); // Get the storage location of u_Sampler0
+  u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0'); // Get the storage location of u_Sampler0
   if (!u_Sampler0) {
     console.log('Failed to get the storage location of u_Sampler0');
     return false;
   }
 
   // Get the storage location of u_Sampler1
-  var u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1'); // Get the storage location of u_Sampler1
+  u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1'); // Get the storage location of u_Sampler1
   if (!u_Sampler1) {
     console.log('Failed to get the storage location of u_Sampler1');
+    return false;
+  }
+
+  // Get the storage location of u_Sampler2
+  u_Sampler2 = gl.getUniformLocation(gl.program, 'u_Sampler2'); // Get the storage location of u_Sampler2
+  if (!u_Sampler2) {
+    console.log('Failed to get the storage location of u_Sampler2');
     return false;
   }
 
@@ -146,13 +158,6 @@ function connectVariablesToGLSL() {
     console.log('Failed to get the storage location of u_whichTexture');
     return false;
   }
-
-  // Get the storage location of u_Size
-  // u_Size = gl.getUniformLocation(gl.program, 'u_Size');
-  // if (!u_Size) {
-  //   console.log('Failed to get the storage location of u_Size');
-  //   return;
-  // }
 
   // Set initial value for this matrix to identify
   var identityM = new Matrix4();
@@ -251,6 +256,23 @@ function initTexture1() {
   return true;
 }
 
+function initTexture2() {
+  // Create the image object
+  var image = new Image(); 
+  if (!image) {
+    console.log('Failed to create the image object');
+    return false;
+  }
+
+  // Register the event handler to be called on loading an image
+  image.onload = function() { sendImageToTEXTURE2(image); };
+  // Specify the image to be loaded
+  image.src = 'ASG3/fire.jpg';
+
+  // Success and image loading
+  return true;
+}
+
 function sendImageToTEXTURE0(image) {
   // Create a texture object
   var texture = gl.createTexture(); 
@@ -275,30 +297,60 @@ function sendImageToTEXTURE0(image) {
 
   // Pass the texture
   gl.uniform1i(u_Sampler0, 0);
-
-  //gl.clear(gl.COLOR_BUFFER_BIT); // Clear <canvas>
-  // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n); // Draw the rectangle
-  console.log('Texture loaded and applied');
 }
 
 function sendImageToTEXTURE1(image) {
+  // Create a texture object
   var texture = gl.createTexture();
   if (!texture) {
     console.log('Failed to create the texture object');
     return false;
   }
 
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // Flip the image's y axis
+  // Flip the image's y axis
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 
-  gl.activeTexture(gl.TEXTURE1); // Activate texture unit 1
+  // Activate texture unit 1
+  gl.activeTexture(gl.TEXTURE1);
 
-  gl.bindTexture(gl.TEXTURE_2D, texture); // Bind the texture object to the target
+  // Bind the texture object to the target
+  gl.bindTexture(gl.TEXTURE_2D, texture);
 
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // Set texture parameters
+  // Set texture parameters
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image); // Assign the image object to the texture object
+  // Assign the image object to the texture object
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
-  gl.uniform1i(u_Sampler1, 1); // Pass the texture
+  // Pass the texture
+  gl.uniform1i(u_Sampler1, 1);
+}
+
+function sendImageToTEXTURE2(image) {
+  // Create a texture object
+  var texture = gl.createTexture();
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
+
+  // Flip the image's y axis
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+  // Activate texture unit 2
+  gl.activeTexture(gl.TEXTURE2);
+
+  // Bind the texture object to the target
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Set texture parameters
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+  // Assign the image object to the texture object
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+  // Pass the texture
+  gl.uniform1i(u_Sampler2, 2);
 }
 
 function main() {
@@ -312,12 +364,10 @@ function main() {
   // Set up actions for HTML UI
   addActionsForHtmlUI();
 
-  // Register the keyboard event handler
-  // document.onkeydown = keydown; 
-
   document.addEventListener('keydown', (ev) => {
     g_activeKeys.add(ev.key.toLowerCase());
   });
+
   document.addEventListener('keyup', (ev) => {
     g_activeKeys.delete(ev.key.toLowerCase());
   });
@@ -325,6 +375,7 @@ function main() {
   // Initialize textures
   initTexture0();
   initTexture1();
+  initTexture2();
 
   // Initialize the camera
   g_camera = new Camera(canvas);
@@ -495,7 +546,7 @@ var g_map = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
   [0, 0, 2, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 3, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
   [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
   [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
   [0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
@@ -515,22 +566,22 @@ function drawMap() {
       if (x === 0 || x === 31 || y === 0 || y === 31) {
         var outlineBottomCube = new Cube();
         outlineBottomCube.color = [0.5, 0.5, 0.5, 1];
-        outlineBottomCube.textureNum = -1; // No texture
+        outlineBottomCube.textureNum = 2; // Fire texture
         outlineBottomCube.matrix.translate(x - 7, -.99, y - 8);
         outlineBottomCube.renderFast();
         var outlineMiddle1 = new Cube();
         outlineMiddle1.color = [0.5, 0.5, 0.5, 1];
-        outlineMiddle1.textureNum = -1; // No texture
+        outlineMiddle1.textureNum = 2; // Fire texture
         outlineMiddle1.matrix.translate(x - 7, .01, y - 8);
         outlineMiddle1.renderFast();
         var outlineMiddle2 = new Cube();
         outlineMiddle2.color = [0.5, 0.5, 0.5, 1];
-        outlineMiddle2.textureNum = -1; // No texture
+        outlineMiddle2.textureNum = 2; // Fire texture
         outlineMiddle2.matrix.translate(x - 7, 1.01, y - 8);
         outlineMiddle2.renderFast();
         var outlineTopCube = new Cube();
         outlineTopCube.color = [0.5, 0.5, 0.5, 1];
-        outlineTopCube.textureNum = -1; // No texture
+        outlineTopCube.textureNum = 2; // Fire texture
         outlineTopCube.matrix.translate(x - 7, 2.01, y - 8);
         outlineTopCube.renderFast();
       }
@@ -549,11 +600,33 @@ function drawMap() {
         cube.renderFast();
       }
       // Block 1 unit above ground
-      if (g_map[x][y] == 2) {
+      else if (g_map[x][y] == 2) {
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, -.99, y - 8);
+        cube.renderFast();
         var cube = new Cube();
         cube.color = [0.5, 0.5, 0.5, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
+        cube.renderFast();
+      }
+      else if (g_map[x][y] == 3) {
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, -.99, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, .01, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 1.01, y - 8);
         cube.renderFast();
       }
     }
@@ -589,7 +662,7 @@ function renderAllShapes() {
   ground.textureNum = 1; // No texture
   ground.matrix.translate(-7.0, -1, -8);
   ground.matrix.rotate(0, 1, 0, 0);
-  ground.matrix.scale(32.0, 0, 32.0);
+  ground.matrix.scale(32.0, 0.01, 32.0);
   ground.render();
 
   // Sky
