@@ -497,6 +497,8 @@ function tick() {
 
   if (g_activeKeys.has('l')) {
     console.log('Camera position:', g_camera.eye.elements);
+    console.log('Camera target:', g_camera.at.elements);
+    console.log('Camera up:', g_camera.up.elements);
   }
   
   // Update the angles of everything if currently animating
@@ -582,71 +584,43 @@ var g_at = [0,0,-100];
 var g_up = [0,1,0];
 
 var g_map = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  // Start of tunnel right, 3 is purple block on top, 3.5 is 3 stack
+  [4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4],
+  [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 1, 2, 3.5, 4.5, 4.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 1, 2, 3.5, 4.5, 4.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 1, 2, 3.5, 4.5, 4.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 1, 2, 3.5, 4.5, 4.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 1, 2, 3.5, 4.5, 4.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 1, 2, 3.5, 4.5, 4.75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 4],
+  // ^Start of tunnel left
+  [4, 5, 5, 5, 5, 5, 5, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4],
+  [4, 5, 5, 5, 5, 5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 4],
+  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
 ];
 
 function drawMap() {
-  // Draws the map outline
-  var mapOutline = [];
-  for (let x = 0; x < 32; x++) {
-    mapOutline[x] = [];
-    for (let y = 0; y < 32; y++) {
-      if (x === 0 || x === 31 || y === 0 || y === 31) {
-        var outlineBottomCube = new Cube();
-        outlineBottomCube.color = [0.5, 0.5, 0.5, 1];
-        outlineBottomCube.textureNum = 2; // Fire texture
-        outlineBottomCube.matrix.translate(x - 7, -.99, y - 8);
-        outlineBottomCube.renderFast();
-        var outlineMiddle1 = new Cube();
-        outlineMiddle1.color = [0.5, 0.5, 0.5, 1];
-        outlineMiddle1.textureNum = 2; // Fire texture
-        outlineMiddle1.matrix.translate(x - 7, .01, y - 8);
-        outlineMiddle1.renderFast();
-        var outlineMiddle2 = new Cube();
-        outlineMiddle2.color = [0.5, 0.5, 0.5, 1];
-        outlineMiddle2.textureNum = 2; // Fire texture
-        outlineMiddle2.matrix.translate(x - 7, 1.01, y - 8);
-        outlineMiddle2.renderFast();
-        var outlineTopCube = new Cube();
-        outlineTopCube.color = [0.5, 0.5, 0.5, 1];
-        outlineTopCube.textureNum = 2; // Fire texture
-        outlineTopCube.matrix.translate(x - 7, 2.01, y - 8);
-        outlineTopCube.renderFast();
-      }
-    }
-  }
-
   // Draws the map with the array
   for (var x = 0; x < g_map.length; x++) {
     for (var y = 0; y < g_map[x].length; y++) {
@@ -654,38 +628,108 @@ function drawMap() {
       if (g_map[x][y] == 1) {
         var cube = new Cube();
         cube.color = [0.5, 0.5, 0.5, 1];
-        cube.textureNum = 3;
+        cube.textureNum = -1;
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
       }
       // Block 1 unit above ground
       else if (g_map[x][y] == 2) {
         var cube = new Cube();
-        cube.color = [0.5, 0.5, 0.5, 1];
-        cube.textureNum = -2; // No texture
+        cube.color = [0, 1, 0, 1];
+        cube.textureNum = -2;
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.color = [0, 1, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
       }
       else if (g_map[x][y] == 3) {
         var cube = new Cube();
-        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.color = [1, 1, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.color = [1, 1, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.color = [1, 1, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 1.01, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [1, 1, 0, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 2.01, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [.2, 0, .7, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 3.01, y - 8);
+        cube.renderFast();
+      }
+      else if (g_map[x][y] == 3.5) {
+        var cube = new Cube();
+        cube.color = [1, 1, 0, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, -.99, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [1, 1, 0, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, .01, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [1, 1, 0, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 1.01, y - 8);
+        cube.renderFast();
+      }
+      else if (g_map[x][y] == 4) {
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = 2; // No texture
+        cube.matrix.translate(x - 7, -.99, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = 2; // No texture
+        cube.matrix.translate(x - 7, .01, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = 2; // No texture
+        cube.matrix.translate(x - 7, 1.01, y - 8);
+        cube.renderFast();
+        var cube = new Cube();
+        cube.color = [0.5, 0.5, 0.5, 1];
+        cube.textureNum = 2; // No texture
+        cube.matrix.translate(x - 7, 2.01, y - 8);
+        cube.renderFast();
+      }
+      else if (g_map[x][y] == 4.5) {
+        var cube = new Cube();
+        cube.color = [1, 0, 0, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 2.01, y - 8);
+        cube.renderFast();
+      }
+      else if (g_map[x][y] == 4.75) {
+        var cube = new Cube();
+        cube.color = [.2, 0, .7, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 3.01, y - 8);
+        cube.renderFast();
+      }
+      else if (g_map[x][y] == 5) {
+        var cube = new Cube();
+        cube.color = [0, 0, 1, 1];
+        cube.textureNum = -2; // No texture
+        cube.matrix.translate(x - 7, 2.01, y - 8);
         cube.renderFast();
       }
     }

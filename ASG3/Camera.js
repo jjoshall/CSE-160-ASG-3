@@ -6,8 +6,8 @@ class Camera {
         this.near = near;
         this.far = far;
 
-        this.eye = new Vector3([39, 23, 9]);
-        this.at = new Vector3([0, 0, 8]);
+        this.eye = new Vector3([8.7, 28, -21]);
+        this.at = new Vector3([8.89, 5, .42]);
         this.up = new Vector3([0, 1, 0]);
 
         this.viewMatrix = new Matrix4();
