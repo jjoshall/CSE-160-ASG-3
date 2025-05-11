@@ -58,7 +58,6 @@ let gl;
 let a_Position;
 let a_UV;
 let u_FragColor;
-let u_Size;
 let u_ModelMatrix;
 let u_ViewMatrix;
 let u_ProjectionMatrix;
@@ -187,15 +186,7 @@ function connectVariablesToGLSL() {
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
 }
 
-// Constants
-const POINT = 0;
-const TRIANGLE = 1;
-const CIRCLE = 2;
-
 // Globals related UI elements
-let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
-let g_selectedSize = 5.0;
-let g_seletcedType = POINT;
 let g_isDragging = false;
 let g_lastMouseX = null;
 let g_lastMouseY = null;
@@ -208,42 +199,18 @@ let g_rightThighAngle = 0;
 let g_rightCalfAngle = 0;
 let g_rightFootAngle = 0;
 let g_eyesScale = 0;
-let g_wingsAnimation = false;
-let g_lowerBeakAnimation = false;
-let g_leftLegAnimation = false;
-let g_leftFootAnimation = false;
-let g_rightLegAnimation = false;
-let g_rightFootAnimation = false;
-let g_shiverAnimation = false;
-let g_shiverStartTime = 0;
+let g_wingsAnimation = true;
+let g_lowerBeakAnimation = true;
+let g_leftLegAnimation = true;
+let g_leftFootAnimation = true;
+let g_rightLegAnimation = true;
+let g_rightFootAnimation = true;
 let g_camera;
 let g_activeKeys = new Set(); // Set to keep track of active keys
 let g_keyProcessed = new Set();
 
 function addActionsForHtmlUI() {
-  // Button events
-  document.getElementById('animationLowerBeakOffButton').onclick = function() { g_lowerBeakAnimation = false; };
-  document.getElementById('animationLowerBeakOnButton').onclick = function() { g_lowerBeakAnimation = true; };
-  document.getElementById('animationWingsOffButton').onclick = function() { g_wingsAnimation = false; };
-  document.getElementById('animationWingsOnButton').onclick = function() { g_wingsAnimation = true; };
-  document.getElementById('animationLeftLegOffButton').onclick = function() { g_leftLegAnimation = false; };
-  document.getElementById('animationLeftLegOnButton').onclick = function() { g_leftLegAnimation = true; };
-  document.getElementById('animationRightLegOffButton').onclick = function() { g_rightLegAnimation = false; };
-  document.getElementById('animationRightLegOnButton').onclick = function() { g_rightLegAnimation = true; };
-  document.getElementById('animationLeftFootOffButton').onclick = function() { g_leftFootAnimation = false; };
-  document.getElementById('animationLeftFootOnButton').onclick = function() { g_leftFootAnimation = true; };
-  document.getElementById('animationRightFootOffButton').onclick = function() { g_rightFootAnimation = false; };
-  document.getElementById('animationRightFootOnButton').onclick = function() { g_rightFootAnimation = true; };
-
-  // Slider events
-  document.getElementById('lowerBeakSlide').addEventListener('mousemove', function() { g_lowerBeakAngle = this.value; renderAllShapes(); });
-  document.getElementById('wingsSlide').addEventListener('mousemove', function() { g_wingsAngle = this.value; renderAllShapes(); });
-  document.getElementById('leftThighSlide').addEventListener('mousemove', function() { g_leftThighAngle = this.value; renderAllShapes(); });
-  document.getElementById('rightThighSlide').addEventListener('mousemove', function() { g_rightThighAngle = this.value; renderAllShapes(); });
-  document.getElementById('leftFootSlide').addEventListener('mousemove', function() { g_leftFootAngle = this.value; renderAllShapes(); });
-  document.getElementById('rightFootSlide').addEventListener('mousemove', function() { g_rightFootAngle = this.value; renderAllShapes(); });
-  document.getElementById('leftCalfSlide').addEventListener('mousemove', function() { g_leftCalfAngle = this.value; renderAllShapes(); });
-  document.getElementById('rightCalfSlide').addEventListener('mousemove', function() { g_rightCalfAngle = this.value; renderAllShapes(); });
+  // nothing to do here
 }
 
 function initTexture0() {
@@ -498,11 +465,6 @@ function main() {
     g_isDragging = true;
     g_lastMouseX = ev.clientX;
     g_lastMouseY = ev.clientY;
-
-    if (ev.shiftKey) {
-      g_shiverAnimation = true;
-      g_shiverStartTime = performance.now() / 1000.0; // Start time in seconds
-    }
   });
 
   canvas.addEventListener('mouseup', function(ev) {
@@ -593,21 +555,6 @@ function updateKeyHandlers() {
 
 // Update the angles of everything if currently animating
 function updateAnimationAngles() {
-  if (g_shiverAnimation) {
-    let elapsed = g_seconds - g_shiverStartTime;
-    
-    if (elapsed > 2) {
-      g_shiverAnimation = false; // Stop the animation after 1 second
-    }
-    else {
-      // shake legs
-      g_leftThighAngle += Math.sin(g_seconds * 20) * 5;
-      g_rightThighAngle += -Math.sin(g_seconds * 20) * 5;
-      // shake wings
-      g_wingsAngle = Math.max(0, 90 * Math.sin(10 * g_seconds)); 
-    }
-  }
-  
   if (g_wingsAnimation) {
     g_wingsAngle = Math.max(0, 45 * Math.sin(4 * g_seconds));
   }
@@ -934,7 +881,11 @@ function renderAllShapes() {
   sky.matrix.translate(-.4, -0.5, -0.5);
   sky.render();
 
-  drawChicken(); // Draw the chicken
+  let chickenOffset = Math.sin(g_seconds * 2.0) * 2.0;
+  let chickenMatrix = new Matrix4();
+  chickenMatrix.translate(chickenOffset, 0, 0); // Move along X-axis
+
+  drawChicken(chickenMatrix); // Draw the chicken
 
   var duration = performance.now() - startTime;
   sendTextToHTML("ms: " + Math.floor(duration) + " fps: " + Math.floor(1000/duration), "numdot");
@@ -1051,10 +1002,11 @@ function deleteBlock() {
   }
 }
 
-function drawChicken() {
+function drawChicken(moveMatrix) {
   // Left thigh
   var leftThigh = new Cube();
   leftThigh.color = [0.9, 0.7, 0, 1.0];
+  leftThigh.matrix = new Matrix4(moveMatrix);
   leftThigh.matrix.translate(9.9, -.35, 0.0); // Translated by 10 units to the right
   leftThigh.matrix.rotate(180, 0, 0, 1);
   leftThigh.matrix.rotate(g_leftThighAngle, 1, 0, 0);
@@ -1065,6 +1017,7 @@ function drawChicken() {
   // Left calf
   var leftCalf = new Cube();
   leftCalf.color = [0.9, 0.7, 0, 1.0];
+  leftCalf.matrix = new Matrix4(moveMatrix);
   leftCalf.matrix = leftThighCoordinatesMat;
   leftCalf.matrix.translate(0.0, .175, 0.0);
   leftCalf.matrix.rotate(g_leftCalfAngle, 1, 0, 0);
@@ -1075,6 +1028,7 @@ function drawChicken() {
   // Left Foot
   var leftFoot = new Cube();
   leftFoot.color = [0.9, 0.7, 0, 1.0];
+  leftFoot.matrix = new Matrix4(moveMatrix);
   leftFoot.matrix = leftCalfCoordinatesMat;
   leftFoot.matrix.translate(.15, .155, .1);
   leftFoot.matrix.rotate(180, 0, 1, 0);
@@ -1085,6 +1039,7 @@ function drawChicken() {
   // Right thigh
   var rightThigh = new Cube();
   rightThigh.color = [0.9, 0.7, 0, 1.0];
+  rightThigh.matrix = new Matrix4(moveMatrix);
   rightThigh.matrix.translate(10.2, -.35, 0.0); // Translated by 10 units to the right
   rightThigh.matrix.rotate(180, 0, 0, 1);
   rightThigh.matrix.rotate(g_rightThighAngle, 1, 0, 0);
@@ -1095,6 +1050,7 @@ function drawChicken() {
   // Right calf
   var rightCalf = new Cube();
   rightCalf.color = [0.9, 0.7, 0, 1.0];
+  rightCalf.matrix = new Matrix4(moveMatrix);
   rightCalf.matrix = rightThighCoordinatesMat;
   rightCalf.matrix.translate(0.0, .175, 0.0);
   rightCalf.matrix.rotate(g_rightCalfAngle, 1, 0, 0);
@@ -1105,6 +1061,7 @@ function drawChicken() {
   // Right Foot
   var rightFoot = new Cube();
   rightFoot.color = [0.9, 0.7, 0, 1.0];
+  rightFoot.matrix = new Matrix4(moveMatrix);
   rightFoot.matrix = rightCalfCoordinatesMat;
   rightFoot.matrix.translate(.15, .155, .1);
   rightFoot.matrix.rotate(180, 0, 1, 0);
@@ -1115,6 +1072,7 @@ function drawChicken() {
   // Gray body
   var body = new Cube();
   body.color = [0.8, 0.8, 0.8, 1.0];
+  body.matrix = new Matrix4(moveMatrix);
   body.textureNum = -2; // No texture
   body.matrix.translate(9.75, -.4, -0.4); // Translated by 10 units to the right
   body.matrix.rotate(0, 1, 0, 0);
@@ -1124,6 +1082,7 @@ function drawChicken() {
   // Right wing
   var rightWing = new Cube();
   rightWing.color = [0.6, 0.6, 0.6, 1.0];
+  rightWing.matrix = new Matrix4(moveMatrix);
   rightWing.matrix.translate(10.25, 0.1, 0.25); // Translated by 10 units to the right
   rightWing.matrix.rotate(180, 1, 0, 0);
   rightWing.matrix.rotate(-g_wingsAngle, 0, 0, 1);
@@ -1133,6 +1092,7 @@ function drawChicken() {
   // Left wing
   var leftWing = new Cube();
   leftWing.color = [0.6, 0.6, 0.6, 1.0];
+  leftWing.matrix = new Matrix4(moveMatrix);
   leftWing.matrix.translate(9.75, .1, -0.25); // Translated by 10 units to the right
   leftWing.matrix.rotate(180, 0, 0, 1);
   leftWing.matrix.rotate(-g_wingsAngle, 0, 0, 1);
@@ -1142,6 +1102,7 @@ function drawChicken() {
   // Head
   var head = new Cube();
   head.color = [0.9, 0.9, 0.9, 1.0];
+  head.matrix = new Matrix4(moveMatrix);
   head.matrix.translate(9.85, 0.03, -0.6); // Translated by 10 units to the right
   head.matrix.rotate(0, 1, 0, 0);
   head.matrix.scale(0.3001, 0.43, 0.27);
@@ -1150,6 +1111,7 @@ function drawChicken() {
   // Beak upper
   var beakUpper = new Cube();
   beakUpper.color = [1.0, 0.6, 0.0, 1.0];
+  beakUpper.matrix = new Matrix4(moveMatrix);
   beakUpper.matrix.translate(9.852, 0.23, -0.75); // Translated by 10 units to the right
   beakUpper.matrix.rotate(0, 1, 0, 0);
   beakUpper.matrix.scale(0.295, 0.05, 0.3);
@@ -1158,6 +1120,7 @@ function drawChicken() {
   // Beak lower
   var beakLower = new Cube();
   beakLower.color = [0.8, 0.5, 0.0, 1.0];
+  beakLower.matrix = new Matrix4(moveMatrix);
   beakLower.matrix.translate(9.852, 0.23, -0.45); // Translated by 10 units to the right
   beakLower.matrix.rotate(180, 1, 0, 0);
   beakLower.matrix.rotate(g_lowerBeakAngle, 1, 0, 0);
@@ -1167,6 +1130,7 @@ function drawChicken() {
   // Gizzard
   var gizzard = new Cube();
   gizzard.color = [1.0, 0, 0.0, 1.0];
+  gizzard.matrix = new Matrix4(moveMatrix);
   gizzard.matrix.translate(9.93, 0.04, -0.7); // Translated by 10 units to the right
   gizzard.matrix.rotate(0, 1, 0, 0);
   gizzard.matrix.scale(0.13, 0.15, 0.1);
@@ -1175,6 +1139,7 @@ function drawChicken() {
   // Left eye
   var leftEye = new Cube();
   leftEye.color = [0.0, 0.0, 0.0, 1.0];
+  leftEye.matrix = new Matrix4(moveMatrix);
   leftEye.matrix.translate(9.85, 0.28, -0.602); // Translated by 10 units to the right
   leftEye.matrix.rotate(0, 1, 0, 0);
   leftEye.matrix.scale(0.08, g_eyesScale, 0.01);
@@ -1183,6 +1148,7 @@ function drawChicken() {
   // Right eye
   var rightEye = new Cube();
   rightEye.color = [0.0, 0.0, 0.0, 1.0];
+  rightEye.matrix = new Matrix4(moveMatrix);
   rightEye.matrix.translate(10.07, 0.28, -0.602); // Translated by 10 units to the right
   rightEye.matrix.rotate(0, 1, 0, 0);
   rightEye.matrix.scale(0.08, g_eyesScale, 0.01);
@@ -1198,23 +1164,21 @@ function sendTextToHTML(text, htmlID) {
   htmlElm.innerHTML = text;
 }
 
-var g_shapesList = []; // The array for the position of a mouse press
+// function click(ev) {
+//   // Extract the event click and return it in WebGL coordinates
+//   let [x, y] = convertCoordinatesEventToGL(ev);
 
-function click(ev) {
-  // Extract the event click and return it in WebGL coordinates
-  let [x, y] = convertCoordinatesEventToGL(ev);
+//   // Draw every shape that is supposed to be drawn
+//   renderAllShapes();
+// }
 
-  // Draw every shape that is supposed to be drawn
-  renderAllShapes();
-}
+// function convertCoordinatesEventToGL(ev) {
+//   var x = ev.clientX; // x coordinate of a mouse pointer
+//   var y = ev.clientY; // y coordinate of a mouse pointer
+//   var rect = ev.target.getBoundingClientRect();
 
-function convertCoordinatesEventToGL(ev) {
-  var x = ev.clientX; // x coordinate of a mouse pointer
-  var y = ev.clientY; // y coordinate of a mouse pointer
-  var rect = ev.target.getBoundingClientRect();
+//   x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
+//   y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
 
-  x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
-  y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
-
-  return([x, y]);
-}
+//   return([x, y]);
+// }
