@@ -24,6 +24,7 @@ var FSHADER_SOURCE =`
   uniform sampler2D u_Sampler2;
   uniform sampler2D u_Sampler3;
   uniform sampler2D u_Sampler4;
+  uniform sampler2D u_Sampler5;
   uniform int u_whichTexture;
   void main() {
     if (u_whichTexture == -2) {
@@ -47,6 +48,9 @@ var FSHADER_SOURCE =`
     else if (u_whichTexture == 4) {
       gl_FragColor = texture2D(u_Sampler4, v_UV); // Use UV debug color
     }
+    else if (u_whichTexture == 5) {
+      gl_FragColor = texture2D(u_Sampler5, v_UV); // Use UV debug color
+    }
     else {
       gl_FragColor = vec4(1, .2, .2, 1); // Error, put redish
     }
@@ -67,6 +71,7 @@ let u_Sampler1;
 let u_Sampler2;
 let u_Sampler3;
 let u_Sampler4;
+let u_Sampler5;
 let u_whichTexture;
 
 function setupWebGL() {
@@ -171,6 +176,13 @@ function connectVariablesToGLSL() {
   u_Sampler4 = gl.getUniformLocation(gl.program, 'u_Sampler4'); // Get the storage location of u_Sampler4
   if (!u_Sampler4) {
     console.log('Failed to get the storage location of u_Sampler4');
+    return false;
+  }
+
+  // Get the storage location of u_Sampler5
+  u_Sampler5 = gl.getUniformLocation(gl.program, 'u_Sampler5'); // Get the storage location of u_Sampler5
+  if (!u_Sampler5) {
+    console.log('Failed to get the storage location of u_Sampler5');
     return false;
   }
 
@@ -293,6 +305,23 @@ function initTexture4() {
   image.onload = function() { sendImageToTEXTURE4(image); };
   // Specify the image to be loaded
   image.src = 'ASG3/flowers.jpg';
+
+  // Success and image loading
+  return true;
+}
+
+function initTexture5() {
+  // Create the image object
+  var image = new Image(); 
+  if (!image) {
+    console.log('Failed to create the image object');
+    return false;
+  }
+
+  // Register the event handler to be called on loading an image
+  image.onload = function() { sendImageToTEXTURE5(image); };
+  // Specify the image to be loaded
+  image.src = 'ASG3/grass.jpg';
 
   // Success and image loading
   return true;
@@ -431,6 +460,33 @@ function sendImageToTEXTURE4(image) {
   gl.uniform1i(u_Sampler4, 4);
 }
 
+function sendImageToTEXTURE5(image) {
+  // Create a texture object
+  var texture = gl.createTexture();
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
+
+  // Flip the image's y axis
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+  // Activate texture unit 5
+  gl.activeTexture(gl.TEXTURE5);
+
+  // Bind the texture object to the target
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Set texture parameters
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+  // Assign the image object to the texture object
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+  // Pass the texture
+  gl.uniform1i(u_Sampler5, 5);
+}
+
 function main() {
   // Set up canvas and gl variables
   setupWebGL();
@@ -456,6 +512,7 @@ function main() {
   initTexture2();
   initTexture3();
   initTexture4();
+  initTexture5();
 
   // Initialize the camera
   g_camera = new Camera(canvas);
@@ -656,7 +713,7 @@ function drawMap() {
       // Block on ground
       if (g_map[x][y] == 1) {
         var cube = new Cube();
-        cube.color = [0.2, 0.2, 0.5, 1];
+        cube.color = [0.675, 0.435, 0.871, .7];
         cube.textureNum = -2;
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
@@ -664,56 +721,56 @@ function drawMap() {
       // Block 1 unit above ground
       else if (g_map[x][y] == 2) {
         var cube = new Cube();
-        cube.color = [0, 1, 0, 1];
+        cube.color = [0.675, 0.435, 0.871, .7];
         cube.textureNum = -2;
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [0, 1, 0, 1];
+        cube.color = [0.675, 0.435, 0.871, 0.8];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
       }
       else if (g_map[x][y] == 3) {
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [1, 0, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [1, 0, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [1, 0, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 1.01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [1, 0, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 2.01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [1, 0, 0, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 3.01, y - 8);
         cube.renderFast();
       }
       else if (g_map[x][y] == 3.5) {
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [0.675, 0.435, 0.871, .9];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [0.675, 0.435, 0.871, .9];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [1, 1, 0, 1];
+        cube.color = [0.675, 0.435, 0.871, .9];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 1.01, y - 8);
         cube.renderFast();
@@ -742,22 +799,22 @@ function drawMap() {
       }
       else if (g_map[x][y] == 4.5) {
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [0.675, 0.435, 0.871, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [0.675, 0.435, 0.871, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [0.675, 0.435, 0.871, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 1.01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [1, 0, 0, 1];
+        cube.color = [0.675, 0.435, 0.871, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 2.01, y - 8);
         cube.renderFast();
@@ -765,7 +822,7 @@ function drawMap() {
       else if (g_map[x][y] == 4.75) {
         var cube = new Cube();
         cube.color = [0, 1, 0, 1];
-        cube.textureNum = -2; // No texture
+        cube.textureNum = 5; // No texture
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
@@ -776,27 +833,27 @@ function drawMap() {
       }
       else if (g_map[x][y] == 4.8) {
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [1, 1, 1, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, -.99, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [1, 1, 1, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, .01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [1, 1, 1, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 1.01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [1, 1, 1, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 2.01, y - 8);
         cube.renderFast();
         var cube = new Cube();
-        cube.color = [.2, 0, .7, 1];
+        cube.color = [1, 1, 1, 1];
         cube.textureNum = -2; // No texture
         cube.matrix.translate(x - 7, 3.01, y - 8);
         cube.renderFast();
@@ -881,9 +938,9 @@ function renderAllShapes() {
   sky.matrix.translate(-.4, -0.5, -0.5);
   sky.render();
 
-  let chickenOffset = Math.sin(g_seconds * 2.0) * 2.0;
+  let chickenOffset = Math.sin(g_seconds * 1.5) * 2.0;
   let chickenMatrix = new Matrix4();
-  chickenMatrix.translate(chickenOffset, 0, 0); // Move along X-axis
+  chickenMatrix.translate(-1, 5 + chickenOffset, 16); // Move along X-axis
 
   drawChicken(chickenMatrix); // Draw the chicken
 
@@ -975,11 +1032,14 @@ function deleteBlock() {
     } else if (currentValue === 2) {
       // If double block, reduce to single
       g_map[mapX][mapZ] = 1;
-    } else if (currentValue === 3 || currentValue === 3.5) {
+    } else if (currentValue === 3) {
       // If triple or quad block, reduce to double
+      g_map[mapX][mapZ] = 4.5;
+    } else if (currentValue === 4.5) {
+      g_map[mapX][mapZ] = 3.5;
+    } else if (currentValue === 3.5) {
       g_map[mapX][mapZ] = 2;
-    } else if (currentValue === 4 || currentValue === 4.5 || 
-               currentValue === 4.75 || currentValue === 4.8) {
+    } else if (currentValue === 4 || currentValue === 4.75 || currentValue === 4.8) {
       // If it's a wall or special structure, don't allow deletion
       // This preserves the main structure of the map
       console.log("Cannot delete structural blocks");
@@ -1164,21 +1224,21 @@ function sendTextToHTML(text, htmlID) {
   htmlElm.innerHTML = text;
 }
 
-// function click(ev) {
-//   // Extract the event click and return it in WebGL coordinates
-//   let [x, y] = convertCoordinatesEventToGL(ev);
+function click(ev) {
+  // Extract the event click and return it in WebGL coordinates
+  let [x, y] = convertCoordinatesEventToGL(ev);
 
-//   // Draw every shape that is supposed to be drawn
-//   renderAllShapes();
-// }
+  // Draw every shape that is supposed to be drawn
+  renderAllShapes();
+}
 
-// function convertCoordinatesEventToGL(ev) {
-//   var x = ev.clientX; // x coordinate of a mouse pointer
-//   var y = ev.clientY; // y coordinate of a mouse pointer
-//   var rect = ev.target.getBoundingClientRect();
+function convertCoordinatesEventToGL(ev) {
+  var x = ev.clientX; // x coordinate of a mouse pointer
+  var y = ev.clientY; // y coordinate of a mouse pointer
+  var rect = ev.target.getBoundingClientRect();
 
-//   x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
-//   y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
+  x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
+  y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
 
-//   return([x, y]);
-// }
+  return([x, y]);
+}
